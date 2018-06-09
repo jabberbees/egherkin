@@ -29,23 +29,23 @@ To run tests:
 
 ## Parsed model
 
-Feature = {Headers, Tags, Name, Description, Background, Scenarios}
-Headers = [{Line :: integer(), Header :: binary()}]
-Tags = [{Line :: integer(), Name :: binary()}]
-Description = [DescriptionLine :: binary()]
-Background = {Line :: integer(), Steps}
-Scenarios = [Scenario]
-Scenario = {Line :: integer(), Name :: binary(), Tags, Steps}
-    | {Line :: integer(), Name :: binary(), Tags, Steps, Examples}
-Steps = [Step]
-Step = {Line :: integer(), GWT, StepParts}
-    | {Line :: integer(), GWT, StepParts, StepArgs}
-GWT = given_keyword | when_keyword | then_keyword | and_keyword | but_keyword
-StepParts = [Part :: binary()]
-StepArgs = {docstring, [Line :: binary()]}
-    | {datatable,
-        [RowName :: binary()],
-        [{RowName :: binary(), Value :: binary()]}
+    Feature = {Headers, Tags, Name, Description, Background, Scenarios}
+    Headers = [{Line :: integer(), Header :: binary()}]
+    Tags = [{Line :: integer(), Name :: binary()}]
+    Description = [DescriptionLine :: binary()]
+    Background = {Line :: integer(), Steps}
+    Scenarios = [Scenario]
+    Scenario = {Line :: integer(), Name :: binary(), Tags, Steps}
+        | {Line :: integer(), Name :: binary(), Tags, Steps, Examples}
+    Steps = [Step]
+    Step = {Line :: integer(), GWT, StepParts}
+        | {Line :: integer(), GWT, StepParts, StepArgs}
+    GWT = given_keyword | when_keyword | then_keyword | and_keyword | but_keyword
+    StepParts = [Part :: binary()]
+    StepArgs = {docstring, [Line :: binary()]}
+        | {datatable,
+            [RowName :: binary()],
+            [{RowName :: binary(), Value :: binary()]}
 
 ## Compatibility
 egherkin was developed and tested with **Erlang/OTP R16B03-1**.
