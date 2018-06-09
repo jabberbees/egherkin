@@ -1,6 +1,6 @@
 -module(egherkin).
 
--export([lexer/1, from_lexer/1, parse/1]).
+-export([lexer/1, from_lexer/1, parse/1, parse_file/1]).
 
 -define(is_gwt(V), ((V == given_keyword)
   orelse (V == when_keyword)
@@ -101,6 +101,12 @@ from_lexer(L) ->
 parse(Source) ->
   Lexed = lexer(Source),
   from_lexer(Lexed).
+
+parse_file(Filename) ->
+  case file:read_file(Filename) of
+  {ok, Source} -> parse(Source);
+  Else -> Else
+  end.
 
 parse_headers(L, Line) ->
   parse_headers(L, Line, []).
