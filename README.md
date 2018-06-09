@@ -1,0 +1,51 @@
+# egherkin
+egherkin is an Erlang library for parsing Gherkin documents.
+
+## Goals
+egherkin aims at providing a *complete* Gherkin parser in a *small* code base.
+
+For efficiency egherkin parses Gherkin documents loaded as binaries and produces a binary based memory model for processing.
+  
+egherkin is *clean* and *well tested* Erlang code.
+
+## How to build
+egherkin uses erlang.mk as build tool so you only need a recent version of *make*:
+
+    git clone https://github.com/jabberbees/egherkin
+    cd egherkin
+    make
+
+To run tests:
+
+    make ct
+
+## How to use
+
+    egherkin:parse(Document :: binary()) -> ParseResult
+
+    egherkin:parse_file(Filename :: string()) -> ParseResult
+
+    ParseResult = Feature | {failed, Line :: integer(), ErrorMessage :: string()}
+
+## Parsed model
+
+Feature = {Headers, Tags, Name, Description, Background, Scenarios}
+Headers = [{Line :: integer(), Header :: binary()}]
+Tags = [{Line :: integer(), Name :: binary()}]
+Description = [DescriptionLine :: binary()]
+Background = {Line :: integer(), Steps}
+Scenarios = [Scenario]
+Scenario = {Line :: integer(), Name :: binary(), Tags, Steps}
+    | {Line :: integer(), Name :: binary(), Tags, Steps, Examples}
+Steps = [Step]
+Step = {Line :: integer(), GWT, StepParts}
+    | {Line :: integer(), GWT, StepParts, StepArgs}
+GWT = given_keyword | when_keyword | then_keyword | and_keyword | but_keyword
+StepParts = [Part :: binary()]
+StepArgs = {docstring, [Line :: binary()]}
+    | {datatable,
+        [RowName :: binary()],
+        [{RowName :: binary(), Value :: binary()]}
+
+## Compatibility
+egherkin was developed and tested with **Erlang/OTP R16B03-1**.
