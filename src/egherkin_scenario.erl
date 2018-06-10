@@ -14,19 +14,15 @@
 
 %% @author Emmanuel Boutin <emmanuel.boutin@jabberbees.com>
 
--module(egherkin_feature).
+-module(egherkin_scenario).
 
--export([name/1, scenario_names/1, scenarios/1, scenario/2]).
+-export([name/1, tags/1, steps/1]).
 
-name({_, _, Name, _, _, _}) ->
-  Name.
+name(Scenario) ->
+  element(2, Scenario).
 
-scenario_names(Feature) ->
-    lists:map(fun egherkin_scenario:name/1, scenarios(Feature)).
+tags(Scenario) ->
+  element(3, Scenario).
 
-scenarios({_, _, _, _, _, Scenarios}) ->
-    Scenarios.
-
-scenario(Feature, Name) ->
-  Scenarios = scenarios(Feature),
-  lists:keyfind(Name, 2, Scenarios).
+steps(Scenario) ->
+  element(4, Scenario).

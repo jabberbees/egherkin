@@ -14,7 +14,7 @@
 
 %% @author Emmanuel Boutin <emmanuel.boutin@jabberbees.com>
 
--module(egherkin_feature_SUITE).
+-module(egherkin_scenario_SUITE).
 -compile(export_all).
 
 -include_lib("common_test/include/ct.hrl").
@@ -35,41 +35,46 @@ end_per_testcase(_TestCase, Config) ->
 all() -> [
 	name_works,
     
-    scenario_returns_scenario,
-    scenario_returns_false,
+    tags_works,
 
-    scenario_names_works
+    steps_works
 ].
 
 %%region name
 
 name_works(_) ->
 	Feature = test_data:parse_output(simple_scenario),
-	?assertEqual(<<"Addition">>, egherkin_feature:name(Feature)),
+    [Scenario] = egherkin_feature:scenarios(Feature),
+	?assertEqual(<<"Add two numbers">>, egherkin_scenario:name(Scenario)),
 	ok.
 
 %%endregion
 
-%%region scenario
+%%region tags
 
-scenario_returns_scenario(_) ->
-	Feature = test_data:parse_output(simple_scenario),
-	?assertMatch({2, <<"Add two numbers">>, [], _},
-        egherkin_feature:scenario(Feature, <<"Add two numbers">>)),
-	ok.
-
-scenario_returns_false(_) ->
-	Feature = test_data:parse_output(simple_scenario),
-	?assertEqual(false, egherkin_feature:scenario(Feature, <<"foo">>)),
+tags_works(_) ->
+	Feature = test_data:parse_output(scenario_tags),
+    [Scenario] = egherkin_feature:scenarios(Feature),
+	?assertEqual([
+        {2,<<"critical">>},
+        {3,<<"non-regression">>},
+        {3,<<"ui">>}
+    ], egherkin_scenario:tags(Scenario)),
 	ok.
 
 %%endregion
 
-%%region scenario_names
+%%region steps
 
-scenario_names_works(_) ->
+steps_works(_) ->
 	Feature = test_data:parse_output(simple_scenario),
-	?assertEqual([<<"Add two numbers">>], egherkin_feature:scenario_names(Feature)),
+    [Scenario] = egherkin_feature:scenarios(Feature),
+	?assertMatch([
+        {3,given_keyword,_},
+        {4,and_keyword,_},
+        {5,when_keyword,[<<"I">>,<<"press">>,<<"add">>]},
+        {6,then_keyword,_}
+    ], egherkin_scenario:steps(Scenario)),
 	ok.
 
 %%endregion
