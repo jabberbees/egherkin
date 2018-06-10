@@ -16,10 +16,23 @@
 
 -module(egherkin_feature).
 
--export([name/1, scenario_names/1, scenarios/1, scenario/2]).
+-export([
+  name/1,
+  tags/1,
+  tag_names/1,
+  scenario_names/1,
+  scenarios/1,
+  scenario/2
+]).
 
 name({_, _, Name, _, _, _}) ->
   Name.
+
+tags({_, Tags, _, _, _, _}) ->
+  Tags.
+
+tag_names(Feature) ->
+  [Name || {_, Name} <- tags(Feature)].
 
 scenario_names(Feature) ->
     lists:map(fun egherkin_scenario:name/1, scenarios(Feature)).

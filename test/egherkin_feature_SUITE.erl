@@ -35,6 +35,10 @@ end_per_testcase(_TestCase, Config) ->
 all() -> [
 	name_works,
     
+	tags_works,
+
+	tag_names_works,
+
     scenario_returns_scenario,
     scenario_returns_false,
 
@@ -46,6 +50,26 @@ all() -> [
 name_works(_) ->
 	Feature = test_data:parse_output(simple_scenario),
 	?assertEqual(<<"Addition">>, egherkin_feature:name(Feature)),
+	ok.
+
+%%endregion
+
+%%region tags
+
+tags_works(_) ->
+	Feature = test_data:parse_output(feature_tags),
+	?assertEqual([{1,<<"critical">>},{2,<<"non-regression">>},{2,<<"ui">>}],
+		egherkin_feature:tags(Feature)),
+	ok.
+
+%%endregion
+
+%%region tag_names
+
+tag_names_works(_) ->
+	Feature = test_data:parse_output(feature_tags),
+	?assertEqual([<<"critical">>,<<"non-regression">>,<<"ui">>],
+		egherkin_feature:tag_names(Feature)),
 	ok.
 
 %%endregion
