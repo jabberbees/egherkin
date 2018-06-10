@@ -39,13 +39,14 @@ To run tests:
         | {Line :: integer(), Name :: binary(), Tags, Steps, Examples}
     Steps = [Step]
     Step = {Line :: integer(), GWT, StepParts}
-        | {Line :: integer(), GWT, StepParts, StepArgs}
+    Examples = DataTable
     GWT = given_keyword | when_keyword | then_keyword | and_keyword | but_keyword
-    StepParts = [Part :: binary()]
-    StepArgs = {docstring, [Line :: binary()]}
-        | {datatable,
-            [RowName :: binary()],
-            [{RowName :: binary(), Value :: binary()]}
+    StepParts = [StepPart]
+    StepPart = binary() | DocString | DataTable
+    DocString = {docstring, [Line :: binary()]}
+    DataTable = {datatable,
+                 [RowName :: binary()],
+                 [{RowName :: binary(), Value :: binary()]}
 
 ## Compatibility
 egherkin was developed and tested with **Erlang/OTP R16B03-1**.

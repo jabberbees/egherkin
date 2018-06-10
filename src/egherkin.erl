@@ -231,7 +231,7 @@ parse_steps([GWT, StepLine, crlf | L], Line, Steps) when ?is_gwt(GWT) andalso is
   {[_, null], L2, Line2} ->
     parse_steps(L2, Line2, [{Line, GWT, StepParts} | Steps]);
   {[_, StepArgs], L2, Line2} ->
-    parse_steps(L2, Line2, [{Line, GWT, StepParts, StepArgs} | Steps])
+    parse_steps(L2, Line2, [{Line, GWT, StepParts ++ [StepArgs]} | Steps])
   end;
 parse_steps([crlf | L], Line, Steps) ->
   parse_steps(L, Line+1, Steps);
