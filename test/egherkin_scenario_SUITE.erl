@@ -37,6 +37,8 @@ all() -> [
     
     tags_works,
 
+	tag_names_works,
+
     steps_works
 ].
 
@@ -60,6 +62,17 @@ tags_works(_) ->
         {3,<<"non-regression">>},
         {3,<<"ui">>}
     ], egherkin_scenario:tags(Scenario)),
+	ok.
+
+%%endregion
+
+%%region tag_names
+
+tag_names_works(_) ->
+	Feature = test_data:parse_output(scenario_tags),
+    [Scenario] = egherkin_feature:scenarios(Feature),
+	?assertEqual([<<"critical">>,<<"non-regression">>,<<"ui">>],
+		egherkin_scenario:tag_names(Scenario)),
 	ok.
 
 %%endregion

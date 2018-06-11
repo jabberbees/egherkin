@@ -16,13 +16,21 @@
 
 -module(egherkin_scenario).
 
--export([name/1, tags/1, steps/1]).
+-export([
+  name/1,
+  tags/1,
+  tag_names/1,
+  steps/1
+]).
 
 name(Scenario) ->
   element(2, Scenario).
 
 tags(Scenario) ->
   element(3, Scenario).
+
+tag_names(Scenario) ->
+  [Name || {_, Name} <- tags(Scenario)].
 
 steps(Scenario) ->
   element(4, Scenario).
