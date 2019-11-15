@@ -20,6 +20,7 @@
   name/1,
   tags/1,
   tag_names/1,
+  background/1,
   scenario_names/1,
   scenarios/1,
   scenario/2
@@ -33,6 +34,9 @@ tags({_, Tags, _, _, _, _}) ->
 
 tag_names(Feature) ->
   [Name || {_, Name} <- tags(Feature)].
+
+background({_, _, _, _, Background, _}) ->
+    Background.
 
 scenario_names(Feature) ->
     lists:map(fun egherkin_scenario:name/1, scenarios(Feature)).

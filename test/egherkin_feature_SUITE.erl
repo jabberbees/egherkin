@@ -39,6 +39,8 @@ all() -> [
 
 	tag_names_works,
 
+	background_works,
+
     scenario_returns_scenario,
     scenario_returns_false,
 
@@ -70,6 +72,16 @@ tag_names_works(_) ->
 	Feature = test_data:parse_output(feature_tags),
 	?assertEqual([<<"critical">>,<<"non-regression">>,<<"ui">>],
 		egherkin_feature:tag_names(Feature)),
+	ok.
+
+%%endregion
+
+%%region background
+
+background_works(_) ->
+	Feature = test_data:parse_output(background),
+	?assertMatch({2, [_, _, _, _]},
+		egherkin_feature:background(Feature)),
 	ok.
 
 %%endregion
