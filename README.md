@@ -46,7 +46,8 @@ To run tests:
     DocString = {docstring, [Line :: binary()]}
     DataTable = {datatable,
                  [RowName :: binary()],
-                 [{RowName :: binary(), Value :: binary()]}
+                 [DataTableRow]}
+    DataTableRow = [{RowName :: binary(), Value :: binary()]
 
 ## Compatibility
 egherkin was developed and tested with **Erlang/OTP R16B03-1**.
