@@ -468,7 +468,7 @@ parse_output(simple_scenario) ->
 		[],
         <<"Addition">>,
 		[],
-		null,
+		undefined,
 		[
 			{2, <<"Add two numbers">>, [], [
 				{3,given_keyword,
@@ -522,7 +522,7 @@ parse_output(datatable_step) ->
 		[],
         <<"Addition">>,
 		[],
-		null,
+		undefined,
 		[
 			{2, <<"Add two numbers">>, [], [
 				{3,given_keyword,
@@ -544,7 +544,7 @@ parse_output(docstring_step) ->
 		[],
         <<"Addition">>,
 		[],
-		null,
+		undefined,
 		[
 			{2, <<"Add two numbers">>, [], [
 				{3,given_keyword,
@@ -564,7 +564,7 @@ parse_output(scenario_outline) ->
 		[],
         <<"Addition">>,
 		[],
-		null,
+		undefined,
 		[
 			{2, <<"Add two numbers">>, [], [
 				{3,given_keyword,
@@ -586,7 +586,7 @@ parse_output(feature_tags) ->
 		[{1,<<"critical">>},{2,<<"non-regression">>},{2,<<"ui">>}],
         <<"Addition">>,
 		[],
-		null,
+		undefined,
 		[
 			{4, <<"Add two numbers">>, [], [
 				{5,given_keyword,
@@ -608,7 +608,7 @@ parse_output(scenario_tags) ->
 		[],
         <<"Addition">>,
 		[],
-		null,
+		undefined,
 		[
 			{4, <<"Add two numbers">>,
 				[{2,<<"critical">>},{3,<<"non-regression">>},{3,<<"ui">>}],
@@ -630,7 +630,7 @@ parse_output(multiple_scenarios) ->
 	{[],
              [{1,<<"critical">>}],
              <<"Addition">>,[],
-		null,
+		undefined,
              [{4,<<"Add two numbers">>,
                [{3,<<"ui">>}],
                [{5,given_keyword,

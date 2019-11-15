@@ -170,7 +170,7 @@ parse_background([background_keyword, crlf | L], Line) ->
     {{Line, Steps}, L2, Line2}
   end;
 parse_background(L, Line) ->
-  {null, L, Line}.
+  {undefined, L, Line}.
 
 parse_scenario_definitions(L, Line) ->
   parse_scenario_definitions(L, Line, []).
@@ -228,7 +228,7 @@ parse_steps([GWT, StepLine, crlf | L], Line, Steps) when ?is_gwt(GWT) andalso is
   case p_seq(Parsers, L, Line+1) of
   {failed, _, _} = Failed ->
     Failed;
-  {[_, null], L2, Line2} ->
+  {[_, undefined], L2, Line2} ->
     parse_steps(L2, Line2, [{Line, GWT, StepParts} | Steps]);
   {[_, StepArgs], L2, Line2} ->
     parse_steps(L2, Line2, [{Line, GWT, StepParts ++ [StepArgs]} | Steps])
@@ -257,7 +257,7 @@ parse_step_args([docstring_keyword, crlf | L], Line) ->
 parse_step_args([<<$|, _/binary>>, crlf | _] = L, Line) ->
   parse_datatable(L, Line);
 parse_step_args(L, Line) ->
-  {null, L, Line}.
+  {undefined, L, Line}.
 
 parse_docstring(L, Line) ->
   parse_docstring(L, Line, []).
@@ -295,7 +295,7 @@ parse_examples(_, Line) ->
 skip_crlfs([crlf | L], Line) ->
   skip_crlfs(L, Line+1);
 skip_crlfs(L, Line) ->
-  {null, L, Line}.
+  {undefined, L, Line}.
 
 parse_eof([], Line) ->
   {eof, [], Line};
