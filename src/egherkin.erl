@@ -283,8 +283,8 @@ parse_datatable(L, Line, Result) ->
   case parse_datatable_lines(lists:reverse(Result)) of
   {failed, _, _} = Failed ->
     Failed;
-  {Headers, Rows} ->
-    DataTable = egherkin_datatable:new(Headers, Rows),
+  {HeadersLine, Headers, Rows} ->
+    DataTable = egherkin_datatable:new(HeadersLine, Headers, Rows),
     {DataTable, L, Line}
   end.
 
@@ -309,8 +309,8 @@ parse_datatable_lines(Lines) ->
   [Headers | Rows] = lists:map(fun parse_datatable_line/1, Lines),
   collect_datatable_rows(Rows, Headers, []).
 
-collect_datatable_rows([], {_, Names}, Result) ->
-  {Names, lists:reverse(Result)};
+collect_datatable_rows([], {Line, Names}, Result) ->
+  {Line, Names, lists:reverse(Result)};
 collect_datatable_rows([{Line, Row} | Rows], {_, Names} = Headers, Result) ->
   if length(Row) == length(Names) ->
     collect_datatable_rows(Rows, Headers, [Row | Result]);

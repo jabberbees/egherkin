@@ -37,20 +37,23 @@
 datatable_to_iolist(DataTable) ->
     datatable_to_iolist(DataTable, default_opts()).
 
-datatable_to_iolist({datatable, [], _}, Opts) ->
-	#options{start_sep = Start, end_sep = End, new_line = NL} = Opts,
-	[Start, <<"<empty>">>, End, NL];
-datatable_to_iolist({datatable, Keys, _} = DataTable, Opts) ->
-	Rows = egherkin_datatable:rows(DataTable),
-	Widths = lists:foldl(fun(Row, Acc) ->
-		update_widths(Row, Acc, [])
-	end, lists:duplicate(length(Keys), 0), Rows),
-	NL = Opts#options.new_line,
-	[
-		format_table_line(Keys, Widths, Opts),
-		NL,
-		[[format_table_line(Row, Widths, Opts), NL] || Row <- Rows]
-	].
+datatable_to_iolist(DataTable, Opts) ->
+	case egherkin_datatable:keys(DataTable) of
+	[] ->
+		#options{start_sep = Start, end_sep = End, new_line = NL} = Opts,
+		[Start, <<"<empty>">>, End, NL];
+	Keys ->
+		Rows = egherkin_datatable:rows(DataTable),
+		Widths = lists:foldl(fun(Row, Acc) ->
+			update_widths(Row, Acc, [])
+		end, lists:duplicate(length(Keys), 0), Rows),
+		NL = Opts#options.new_line,
+		[
+			format_table_line(Keys, Widths, Opts),
+			NL,
+			[[format_table_line(Row, Widths, Opts), NL] || Row <- Rows]
+		]
+	end.
 
 update_widths([Value | More], [Width | MoreW], Result) ->
 	W = byte_size(Value),

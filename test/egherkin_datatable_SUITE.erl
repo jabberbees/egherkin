@@ -51,7 +51,7 @@ new_works(_) ->
     Rows = [
         [<<"foo">>, <<"bar">>, <<"foobar">>]
     ],
-	?assertEqual({datatable, Keys, Rows},
+	?assertEqual({datatable, undefined, Keys, Rows},
         egherkin_datatable:new(Keys, Rows)).
 
 %%endregion
