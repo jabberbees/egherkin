@@ -281,8 +281,11 @@ parse_datatable([crlf | L], Line, Result) ->
   parse_datatable(L, Line+1, Result);
 parse_datatable(L, Line, Result) ->
   case parse_datatable_lines(lists:reverse(Result)) of
-  {failed, _, _} = Failed -> Failed;
-  {Headers, Rows} -> {{datatable, Headers, Rows}, L, Line}
+  {failed, _, _} = Failed ->
+    Failed;
+  {Headers, Rows} ->
+    DataTable = egherkin_datatable:new(Headers, Rows),
+    {DataTable, L, Line}
   end.
 
 parse_examples([crlf | L], Line) ->
@@ -304,14 +307,13 @@ parse_eof(_, Line) ->
 
 parse_datatable_lines(Lines) ->
   [Headers | Rows] = lists:map(fun parse_datatable_line/1, Lines),
-  zip_datatable_rows(Rows, Headers, []).
+  collect_datatable_rows(Rows, Headers, []).
 
-zip_datatable_rows([], {_, Names}, Result) ->
+collect_datatable_rows([], {_, Names}, Result) ->
   {Names, lists:reverse(Result)};
-zip_datatable_rows([{Line, Row} | Rows], {_, Names} = Headers, Result) ->
+collect_datatable_rows([{Line, Row} | Rows], {_, Names} = Headers, Result) ->
   if length(Row) == length(Names) ->
-    KeyValues = lists:zip(Names, Row),
-    zip_datatable_rows(Rows, Headers, [KeyValues | Result]);
+    collect_datatable_rows(Rows, Headers, [Row | Result]);
   true ->
     {failed, Line, "column count mismatch"}
   end.

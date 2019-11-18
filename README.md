@@ -47,7 +47,7 @@ To run tests:
     DataTable = {datatable,
                  [RowName :: binary()],
                  [DataTableRow]}
-    DataTableRow = [{RowName :: binary(), Value :: binary()]
+    DataTableRow = [Value :: binary()]
 
 ## Compatibility
 egherkin was developed and tested with **Erlang/OTP R16B03-1**.
