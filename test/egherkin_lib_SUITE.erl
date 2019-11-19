@@ -21,25 +21,36 @@
 -include_lib("assert.hrl").
 
 all() -> [
-    datatable_to_iolist_no_keys_no_rows,
-    datatable_to_iolist_no_keys,
-    datatable_to_iolist_no_rows,
-    datatable_to_iolist_1_row,
+    datatable_to_iolist_2_no_keys_no_rows,
+    datatable_to_iolist_2_no_keys,
+    datatable_to_iolist_2_no_rows,
+    datatable_to_iolist_2_1_row,
 
-    format_table_line_1,
-    format_table_line_2,
-    format_table_line_3
+    datatable_to_iolist_3_no_highlight,
+    datatable_to_iolist_3_1_line_highlighted,
+    datatable_to_iolist_3_1_cell_highlighted,
+
+    format_table_line_2_returns_empty,
+    format_table_line_2_handles_incorrect_widths,
+    format_table_line_2_works,
+
+    format_table_line_3_returns_empty,
+    format_table_line_3_handles_incorrect_widths,
+    format_table_line_3_works,
+    format_table_line_3_highlights_first_column,
+    format_table_line_3_highlights_middle_column,
+    format_table_line_3_highlights_last_column
 ].
 
-%%region datatable_to_iolist
+%%region datatable_to_iolist/1
 
-datatable_to_iolist_no_keys_no_rows(_) ->
+datatable_to_iolist_2_no_keys_no_rows(_) ->
     Table = egherkin_datatable:new([], []),
 	?assertEqual(<<
         "| <empty> |\n"
     >>, iolist_to_binary(egherkin_lib:datatable_to_iolist(Table))).
 
-datatable_to_iolist_no_keys(_) ->
+datatable_to_iolist_2_no_keys(_) ->
     Table = egherkin_datatable:new([], [
         [<<"foo">>, <<"bar">>, <<"foobar">>]
     ]),
@@ -47,13 +58,13 @@ datatable_to_iolist_no_keys(_) ->
         "| <empty> |\n"
     >>, iolist_to_binary(egherkin_lib:datatable_to_iolist(Table))).
 
-datatable_to_iolist_no_rows(_) ->
+datatable_to_iolist_2_no_rows(_) ->
     Table = egherkin_datatable:new([<<"a">>, <<"b">>, <<"c">>], []),
 	?assertEqual(<<
         "| a | b | c |\n"
     >>, iolist_to_binary(egherkin_lib:datatable_to_iolist(Table))).
 
-datatable_to_iolist_1_row(_) ->
+datatable_to_iolist_2_1_row(_) ->
     Table = egherkin_datatable:new([<<"a">>, <<"b">>, <<"c">>], [
         [<<"foo">>, <<"bar">>, <<"foobar">>]
     ]),
@@ -64,24 +75,118 @@ datatable_to_iolist_1_row(_) ->
 
 %%endregion
 
-%%region format_table_line
+%%region datatable_to_iolist/3
 
-format_table_line_1(_) ->
+datatable_to_iolist_3_no_highlight(_) ->
+    Table = egherkin_datatable:new([<<"a">>, <<"b">>, <<"c">>], [
+        [<<"foo">>, <<"bar">>, <<"foobar">>]
+    ]),
+	?assertEqual(<<
+        "| a   | b   | c      |\n"
+        "| foo | bar | foobar |\n"
+    >>, iolist_to_binary(egherkin_lib:datatable_to_iolist(Table, undefined, undefined))).
+
+datatable_to_iolist_3_1_line_highlighted(_) ->
+    Table = egherkin_datatable:new([<<"a">>, <<"b">>, <<"c">>], [
+        [<<"foo">>, <<"bar">>, <<"foobar">>],
+        [<<"foo">>, <<"bar">>, <<"foobar">>],
+        [<<"foo">>, <<"bar">>, <<"foobar">>]
+    ]),
+	?assertEqual(<<
+        "| a   | b   | c      |\n"
+        "| foo | bar | foobar |\n"
+        "> foo | bar | foobar <\n"
+        "| foo | bar | foobar |\n"
+    >>, iolist_to_binary(egherkin_lib:datatable_to_iolist(Table, 2, undefined))).
+
+datatable_to_iolist_3_1_cell_highlighted(_) ->
+    Table = egherkin_datatable:new([<<"a">>, <<"b">>, <<"c">>], [
+        [<<"foo">>, <<"bar">>, <<"foobar">>],
+        [<<"foo">>, <<"bar">>, <<"foobar">>],
+        [<<"foo">>, <<"bar">>, <<"foobar">>]
+    ]),
+	?assertEqual(<<
+        "| a   | b   | c      |\n"
+        "| foo | bar | foobar |\n"
+        "> foo < bar | foobar |\n"
+        "| foo | bar | foobar |\n"
+    >>, iolist_to_binary(egherkin_lib:datatable_to_iolist(Table, 2, <<"a">>))).
+
+%%endregion
+
+%%region format_table_line/2
+
+format_table_line_2_returns_empty(_) ->
     Values = [],
     Widths = [],
+    Opts = egherkin_lib:default_opts(),
 	?assertEqual(<<"">>,
-        iolist_to_binary(egherkin_lib:format_table_line(Values, Widths))).
+        iolist_to_binary(egherkin_lib:format_table_line(Values, Widths, Opts))).
 
-format_table_line_2(_) ->
+format_table_line_2_handles_incorrect_widths(_) ->
     Values = [<<"abcd">>, <<"abcd">>, <<"abcd">>],
     Widths = [0, 0, 0],
+    Opts = egherkin_lib:default_opts(),
 	?assertEqual(<<"| abcd | abcd | abcd |">>,
-        iolist_to_binary(egherkin_lib:format_table_line(Values, Widths))).
+        iolist_to_binary(egherkin_lib:format_table_line(Values, Widths, Opts))).
 
-format_table_line_3(_) ->
+format_table_line_2_works(_) ->
     Values = [<<"abcd">>, <<"abcd">>, <<"abcd">>],
     Widths = [4, 5, 6],
+    Opts = egherkin_lib:default_opts(),
 	?assertEqual(<<"| abcd | abcd  | abcd   |">>,
-        iolist_to_binary(egherkin_lib:format_table_line(Values, Widths))).
+        iolist_to_binary(egherkin_lib:format_table_line(Values, Widths, Opts))).
+
+%%endregion
+
+%%region format_table_line/3
+
+format_table_line_3_returns_empty(_) ->
+    Values = [],
+    Widths = [],
+    Highlights = [none, none, none],
+    Opts = egherkin_lib:default_opts(),
+	?assertEqual(<<"">>,
+        iolist_to_binary(egherkin_lib:format_table_line(Values, Widths, Highlights, Opts))).
+
+format_table_line_3_handles_incorrect_widths(_) ->
+    Values = [<<"abcd">>, <<"abcd">>, <<"abcd">>],
+    Widths = [0, 0, 0],
+    Highlights = [none, none, none],
+    Opts = egherkin_lib:default_opts(),
+	?assertEqual(<<"| abcd | abcd | abcd |">>,
+        iolist_to_binary(egherkin_lib:format_table_line(Values, Widths, Highlights, Opts))).
+
+format_table_line_3_works(_) ->
+    Values = [<<"abcd">>, <<"abcd">>, <<"abcd">>],
+    Widths = [4, 5, 6],
+    Highlights = [none, none, none],
+    Opts = egherkin_lib:default_opts(),
+	?assertEqual(<<"| abcd | abcd  | abcd   |">>,
+        iolist_to_binary(egherkin_lib:format_table_line(Values, Widths, Highlights, Opts))).
+
+format_table_line_3_highlights_first_column(_) ->
+    Values = [<<"abcd">>, <<"abcd">>, <<"abcd">>],
+    Widths = [4, 5, 6],
+    Highlights = [highlight, none, none],
+    Opts = egherkin_lib:default_opts(),
+	?assertEqual(<<"> abcd < abcd  | abcd   |">>,
+        iolist_to_binary(egherkin_lib:format_table_line(Values, Widths, Highlights, Opts))).
+
+format_table_line_3_highlights_middle_column(_) ->
+    Values = [<<"abcd">>, <<"abcd">>, <<"abcd">>],
+    Widths = [4, 5, 6],
+    Highlights = [none, highlight, none],
+    Opts = egherkin_lib:default_opts(),
+	?assertEqual(<<"| abcd > abcd  < abcd   |">>,
+        iolist_to_binary(egherkin_lib:format_table_line(Values, Widths, Highlights, Opts))).
+
+format_table_line_3_highlights_last_column(_) ->
+    Values = [<<"abcd">>, <<"abcd">>, <<"abcd">>],
+    Widths = [4, 5, 6],
+    Highlights = [none, none, highlight],
+    Opts = egherkin_lib:default_opts(),
+	?assertEqual(<<"| abcd | abcd  > abcd   <">>,
+        iolist_to_binary(egherkin_lib:format_table_line(Values, Widths, Highlights, Opts))).
 
 %%endregion
