@@ -36,7 +36,7 @@
 }).
 
 new(Keys, Rows) ->
-    #datatable{keys = Keys, rows = Rows}.
+    #datatable{line = 0, keys = Keys, rows = Rows}.
 
 new(Line, Keys, Rows) ->
     #datatable{line = Line, keys = Keys, rows = Rows}.
@@ -73,11 +73,21 @@ are_equal_unordered(DT1, DT2) ->
     R2 = lists:sort(rows(DT2)),
     K1 =:= K2 andalso R1 =:= R2.
 
-matches(Data, Projection, Comparison, #datatable{keys = Keys} = DataTable) ->
-    Rows1 = project_data(Keys, Data, Projection),
-    Rows2 = rows(DataTable),
-    Pred = fun({A, B}) -> row_compare(A, B, Comparison) end,
-    lists:all(Pred, lists:zip(Rows1, Rows2)).
+matches(Data, Projection, Comparison,
+        #datatable{line = Line, keys = Keys, rows = Rows}) ->
+    DataRows = project_data(Keys, Data, Projection),
+    match_rows(DataRows, Rows, Keys, Comparison, Line+1).
+
+match_rows([DataRow | DataMore], [TableRow | TableMore], Keys, Comparison, Line) ->
+    case row_compare(Keys, DataRow, TableRow, Comparison) of
+    true -> match_rows(DataMore, TableMore, Keys, Comparison, Line+1);
+    match -> match_rows(DataMore, TableMore, Keys, Comparison, Line+1);
+    false -> {nomatch, Line};
+    nomatch -> {nomatch, Line};
+    {nomatch, Key} -> {nomatch, Line, Key}
+    end;
+match_rows([], _, _, _, _) ->
+    match.
 
 project_data(_Keys, Data, Fun) when is_function(Fun, 1) ->
     lists:map(Fun, Data);
@@ -89,10 +99,19 @@ project_data(Keys, Data, Projection) when is_list(Projection) ->
 project_data_row(Keys, Row, Projection) ->
     [Proj(Key, Row) || {Key, Proj} <- lists:zip(Keys, Projection)].
 
-row_compare(Row1, Row2, Comparison) when is_function(Comparison, 2) ->
+row_compare(_Keys, Row1, Row2, Comparison) when is_function(Comparison, 2) ->
     Comparison(Row1, Row2);
-row_compare(Row1, Row2, Comparison) when is_list(Comparison) ->
-    lists:foldl(fun
-    (_, false) -> false;
-    ({V1, V2, Fun}, _) -> Fun(V1, V2)
-    end, true, lists:zip3(Row1, Row2, Comparison)).
+row_compare(Keys, Row1, Row2, Comparison) when is_function(Comparison, 3) ->
+    Comparison(Keys, Row1, Row2);
+row_compare(Keys, Row1, Row2, Comparison) when is_list(Comparison) ->
+    row_compare_values(Keys, Row1, Row2, Comparison).
+
+row_compare_values([Key | Keys], [V1 | More1], [V2 | More2], [C | MoreC]) ->
+    case C(V1, V2) of
+    false ->
+        {nomatch, Key};
+    true ->
+        row_compare_values(Keys, More1, More2, MoreC)
+    end;
+row_compare_values([], _, _, _) ->
+    match.
