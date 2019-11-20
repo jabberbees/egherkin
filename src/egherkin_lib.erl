@@ -90,7 +90,7 @@ datatable_to_iolist(DataTable, HighlightLine, HighlightKey) ->
 datatable_to_iolist(DataTable, HighlightLine, HighlightKey, Opts) ->
 	case egherkin_datatable:keys(DataTable) of
 	[] ->
-		#options{start_sep = Start, end_sep = End, new_line = NL} = Opts,
+		#options{start_sep = Start, end_sep = End} = Opts,
 		[Start, <<"<empty>">>, End];
 	Keys ->
 		Line = egherkin_datatable:line(DataTable),
