@@ -17,6 +17,10 @@
 -module(egherkin_lib).
 
 -export([
+	format_gwt/1,
+	
+	format_step_parts/1,
+
 	datatable_to_iolist/1,
     datatable_to_iolist/2,
 	datatable_to_iolist/3,
@@ -27,6 +31,35 @@
 
 	default_opts/0
 ]).
+
+%%region format_gwt
+
+format_gwt(given_keyword) -> <<"Given">>;
+format_gwt(when_keyword) -> <<"When">>;
+format_gwt(then_keyword) -> <<"Then">>;
+format_gwt(and_keyword) -> <<"And">>;
+format_gwt(but_keyword) -> <<"But">>.
+
+format_step_parts(StepParts) ->
+	format_step_parts(StepParts, []).
+	
+format_step_parts([Part | More], []) ->
+	format_step_parts(More, [Part]);
+format_step_parts([{docstring, Lines} | More], Result) ->
+	Docstring = <<"\"\"\"">>,
+	NL = <<"\n">>,
+	Result2 = lists:foldl(fun(Line, Acc) ->
+		[Line, NL | Acc]
+	end, [Docstring, <<":\n">> | Result], Lines),
+	format_step_parts(More, [Docstring, NL | Result2]);
+format_step_parts([DataTable | More], Result) when element(1, DataTable) =:= datatable ->
+	format_step_parts(More, [datatable_to_iolist(DataTable), <<":\n">> | Result]);
+format_step_parts([Part | More], Result) ->
+	format_step_parts(More, [Part, <<" ">> | Result]);
+format_step_parts([], Result) ->
+	lists:reverse(Result).
+
+%%endregion
 
 %%region datatable_to_iolist
 
@@ -58,7 +91,7 @@ datatable_to_iolist(DataTable, HighlightLine, HighlightKey, Opts) ->
 	case egherkin_datatable:keys(DataTable) of
 	[] ->
 		#options{start_sep = Start, end_sep = End, new_line = NL} = Opts,
-		[Start, <<"<empty>">>, End, NL];
+		[Start, <<"<empty>">>, End];
 	Keys ->
 		Line = egherkin_datatable:line(DataTable),
 		Rows = egherkin_datatable:rows(DataTable),
@@ -78,11 +111,10 @@ datatable_to_iolist(DataTable, HighlightLine, HighlightKey, Opts) ->
 			_ ->
 				format_table_line(Row, Widths, Opts)
 			end,
-			{CurLine+1, [[FTL, NL] | Acc]}
+			{CurLine+1, [FTL, NL | Acc]}
 		end, {Line+1, []}, Rows),
 		[
 			format_table_line(Keys, Widths, Opts),
-			NL,
 			lists:reverse(FormattedLines)
 		]
 	end.

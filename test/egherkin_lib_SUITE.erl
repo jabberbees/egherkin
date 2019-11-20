@@ -21,6 +21,12 @@
 -include_lib("assert.hrl").
 
 all() -> [
+    format_gwt_works,
+
+    format_step_parts_only_binaries,
+    format_step_parts_docstring,
+    format_step_parts_datatable,
+
     datatable_to_iolist_2_no_keys_no_rows,
     datatable_to_iolist_2_no_keys,
     datatable_to_iolist_2_no_rows,
@@ -42,12 +48,58 @@ all() -> [
     format_table_line_3_highlights_last_column
 ].
 
+%%region format_gwt/1
+
+format_gwt_works(_) ->
+	?assertEqual(<<"Given">>, egherkin_lib:format_gwt(given_keyword)),
+	?assertEqual(<<"When">>, egherkin_lib:format_gwt(when_keyword)),
+	?assertEqual(<<"Then">>, egherkin_lib:format_gwt(then_keyword)),
+	?assertEqual(<<"And">>, egherkin_lib:format_gwt(and_keyword)),
+	?assertEqual(<<"But">>, egherkin_lib:format_gwt(but_keyword)),
+    ok.
+
+%%endregion
+
+%%region format_step_parts/1
+
+format_step_parts_only_binaries(_) ->
+    Parts = [<<"I">>, <<"love">>, <<"wood">>],
+	?assertEqual(<<
+        "I love wood"
+    >>, iolist_to_binary(egherkin_lib:format_step_parts(Parts))).
+
+format_step_parts_docstring(_) ->
+    Parts = [
+        <<"I">>, <<"love">>, <<"this">>,
+        {docstring, [<<"wood">>]}
+    ],
+	?assertEqual(<<
+        "I love this:\n"
+        "\"\"\"\n"
+        "wood\n"
+        "\"\"\""
+    >>, iolist_to_binary(egherkin_lib:format_step_parts(Parts))).
+
+format_step_parts_datatable(_) ->
+    Parts = [
+        <<"I">>, <<"love">>, <<"this">>,
+        egherkin_datatable:new([<<"a">>, <<"b">>, <<"c">>],
+            [[<<"foo">>, <<"bar">>, <<"foobar">>]])
+    ],
+	?assertEqual(<<
+        "I love this:\n"
+        "| a   | b   | c      |\n"
+        "| foo | bar | foobar |"
+    >>, iolist_to_binary(egherkin_lib:format_step_parts(Parts))).
+
+%%endregion
+
 %%region datatable_to_iolist/1
 
 datatable_to_iolist_2_no_keys_no_rows(_) ->
     Table = egherkin_datatable:new([], []),
 	?assertEqual(<<
-        "| <empty> |\n"
+        "| <empty> |"
     >>, iolist_to_binary(egherkin_lib:datatable_to_iolist(Table))).
 
 datatable_to_iolist_2_no_keys(_) ->
@@ -55,13 +107,13 @@ datatable_to_iolist_2_no_keys(_) ->
         [<<"foo">>, <<"bar">>, <<"foobar">>]
     ]),
 	?assertEqual(<<
-        "| <empty> |\n"
+        "| <empty> |"
     >>, iolist_to_binary(egherkin_lib:datatable_to_iolist(Table))).
 
 datatable_to_iolist_2_no_rows(_) ->
     Table = egherkin_datatable:new([<<"a">>, <<"b">>, <<"c">>], []),
 	?assertEqual(<<
-        "| a | b | c |\n"
+        "| a | b | c |"
     >>, iolist_to_binary(egherkin_lib:datatable_to_iolist(Table))).
 
 datatable_to_iolist_2_1_row(_) ->
@@ -70,7 +122,7 @@ datatable_to_iolist_2_1_row(_) ->
     ]),
 	?assertEqual(<<
         "| a   | b   | c      |\n"
-        "| foo | bar | foobar |\n"
+        "| foo | bar | foobar |"
     >>, iolist_to_binary(egherkin_lib:datatable_to_iolist(Table))).
 
 %%endregion
@@ -83,7 +135,7 @@ datatable_to_iolist_3_no_highlight(_) ->
     ]),
 	?assertEqual(<<
         "| a   | b   | c      |\n"
-        "| foo | bar | foobar |\n"
+        "| foo | bar | foobar |"
     >>, iolist_to_binary(egherkin_lib:datatable_to_iolist(Table, undefined, undefined))).
 
 datatable_to_iolist_3_1_line_highlighted(_) ->
@@ -96,7 +148,7 @@ datatable_to_iolist_3_1_line_highlighted(_) ->
         "| a   | b   | c      |\n"
         "| foo | bar | foobar |\n"
         "> foo | bar | foobar <\n"
-        "| foo | bar | foobar |\n"
+        "| foo | bar | foobar |"
     >>, iolist_to_binary(egherkin_lib:datatable_to_iolist(Table, 2, undefined))).
 
 datatable_to_iolist_3_1_cell_highlighted(_) ->
@@ -109,7 +161,7 @@ datatable_to_iolist_3_1_cell_highlighted(_) ->
         "| a   | b   | c      |\n"
         "| foo | bar | foobar |\n"
         "> foo < bar | foobar |\n"
-        "| foo | bar | foobar |\n"
+        "| foo | bar | foobar |"
     >>, iolist_to_binary(egherkin_lib:datatable_to_iolist(Table, 2, <<"a">>))).
 
 %%endregion
