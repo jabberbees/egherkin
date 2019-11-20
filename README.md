@@ -45,6 +45,7 @@ To run tests:
     StepPart = binary() | DocString | DataTable
     DocString = {docstring, [Line :: binary()]}
     DataTable = {datatable,
+                 Line :: integer(),
                  [RowName :: binary()],
                  [DataTableRow]}
     DataTableRow = [Value :: binary()]
