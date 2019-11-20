@@ -50,10 +50,10 @@ format_step_parts([{docstring, Lines} | More], Result) ->
 	NL = <<"\n">>,
 	Result2 = lists:foldl(fun(Line, Acc) ->
 		[Line, NL | Acc]
-	end, [Docstring, <<":\n">> | Result], Lines),
+	end, [Docstring, <<"\n">> | Result], Lines),
 	format_step_parts(More, [Docstring, NL | Result2]);
 format_step_parts([DataTable | More], Result) when element(1, DataTable) =:= datatable ->
-	format_step_parts(More, [datatable_to_iolist(DataTable), <<":\n">> | Result]);
+	format_step_parts(More, [datatable_to_iolist(DataTable), <<"\n">> | Result]);
 format_step_parts([Part | More], Result) ->
 	format_step_parts(More, [Part, <<" ">> | Result]);
 format_step_parts([], Result) ->

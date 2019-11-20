@@ -70,7 +70,7 @@ format_step_parts_only_binaries(_) ->
 
 format_step_parts_docstring(_) ->
     Parts = [
-        <<"I">>, <<"love">>, <<"this">>,
+        <<"I">>, <<"love">>, <<"this:">>,
         {docstring, [<<"wood">>]}
     ],
 	?assertEqual(<<
@@ -82,7 +82,7 @@ format_step_parts_docstring(_) ->
 
 format_step_parts_datatable(_) ->
     Parts = [
-        <<"I">>, <<"love">>, <<"this">>,
+        <<"I">>, <<"love">>, <<"this:">>,
         egherkin_datatable:new([<<"a">>, <<"b">>, <<"c">>],
             [[<<"foo">>, <<"bar">>, <<"foobar">>]])
     ],
