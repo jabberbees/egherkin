@@ -93,7 +93,6 @@ datatable_to_iolist(DataTable, HighlightLine, HighlightKey, Opts) ->
 		#options{start_sep = Start, end_sep = End} = Opts,
 		[Start, <<"<empty>">>, End];
 	Keys ->
-		Line = egherkin_datatable:line(DataTable),
 		Rows = egherkin_datatable:rows(DataTable),
 		Widths = lists:foldl(fun(Row, Acc) ->
 			update_widths(Row, Acc, [])
@@ -112,7 +111,7 @@ datatable_to_iolist(DataTable, HighlightLine, HighlightKey, Opts) ->
 				format_table_line(Row, Widths, Opts)
 			end,
 			{CurLine+1, [FTL, NL | Acc]}
-		end, {Line+1, []}, Rows),
+		end, {0, []}, Rows),
 		[
 			format_table_line(Keys, Widths, Opts),
 			lists:reverse(FormattedLines)

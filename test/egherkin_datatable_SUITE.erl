@@ -23,8 +23,6 @@
 all() -> [
     new_2_works,
 
-    new_3_works,
-
     keys_works,
     
     rows_works,
@@ -58,20 +56,8 @@ new_2_works(_) ->
     Rows = [
         [<<"foo">>, <<"bar">>, <<"foobar">>]
     ],
-	?assertEqual({datatable, 0, Keys, Rows},
+	?assertEqual({datatable, Keys, Rows},
         egherkin_datatable:new(Keys, Rows)).
-
-%%endregion
-
-%%region new/32
-
-new_3_works(_) ->
-    Keys = [<<"a">>, <<"b">>, <<"c">>],
-    Rows = [
-        [<<"foo">>, <<"bar">>, <<"foobar">>]
-    ],
-	?assertEqual({datatable, 42, Keys, Rows},
-        egherkin_datatable:new(42, Keys, Rows)).
 
 %%endregion
 
@@ -280,7 +266,7 @@ matches_4_returns_nomatch_comparison_fun_2(_) ->
     ],
     Projection = fun(Row) -> Row end,
     Comparison = fun(RowA, RowB) -> RowA =:= RowB end,
-	?assertEqual({nomatch, 2},
+	?assertEqual({nomatch, 1},
         egherkin_datatable:matches(Data, Projection, Comparison, DataTable)).
 
 matches_4_returns_match_comparison_fun_3(_) ->
@@ -319,7 +305,7 @@ matches_4_returns_nomatch_comparison_fun_3(_) ->
     (_, R, R) -> match;
     (_, _, _) -> nomatch
     end,
-	?assertEqual({nomatch, 2},
+	?assertEqual({nomatch, 1},
         egherkin_datatable:matches(Data, Projection, Comparison, DataTable)).
 
 matches_4_returns_nomatch_with_key_comparison_fun_3(_) ->
@@ -340,7 +326,7 @@ matches_4_returns_nomatch_with_key_comparison_fun_3(_) ->
     (_, R, R) -> match;
     (_, _, _) -> {nomatch, <<"b">>}
     end,
-	?assertEqual({nomatch, 2, <<"b">>},
+	?assertEqual({nomatch, 1, <<"b">>},
         egherkin_datatable:matches(Data, Projection, Comparison, DataTable)).
 
 matches_4_returns_match_json_list(_) ->
@@ -376,7 +362,7 @@ matches_4_returns_nomatch_with_key_json_list(_) ->
     ],
     Projection = lists:duplicate(3, fun proplists:get_value/2),
     Comparison = lists:duplicate(3, fun match_json_value/2),
-	?assertEqual({nomatch, 2, <<"b">>},
+	?assertEqual({nomatch, 1, <<"b">>},
         egherkin_datatable:matches(Data, Projection, Comparison, DataTable)).
 
 %%endregion

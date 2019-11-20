@@ -18,8 +18,6 @@
 
 -export([
     new/2,
-    new/3,
-    line/1,
     keys/1,
     rows/1,
     rows_as_proplists/1,
@@ -30,19 +28,12 @@
 ]).
 
 -record(datatable, {
-    line,
     keys,
     rows
 }).
 
 new(Keys, Rows) ->
-    #datatable{line = 0, keys = Keys, rows = Rows}.
-
-new(Line, Keys, Rows) ->
-    #datatable{line = Line, keys = Keys, rows = Rows}.
-
-line(#datatable{line = Line}) ->
-	Line.
+    #datatable{keys = Keys, rows = Rows}.
 
 keys(#datatable{keys = Keys}) ->
 	Keys.
@@ -74,9 +65,9 @@ are_equal_unordered(DT1, DT2) ->
     K1 =:= K2 andalso R1 =:= R2.
 
 matches(Data, Projection, Comparison,
-        #datatable{line = Line, keys = Keys, rows = Rows}) ->
+        #datatable{keys = Keys, rows = Rows}) ->
     DataRows = project_data(Keys, Data, Projection),
-    match_rows(DataRows, Rows, Keys, Comparison, Line+1).
+    match_rows(DataRows, Rows, Keys, Comparison, 0).
 
 match_rows([DataRow | DataMore], [TableRow | TableMore], Keys, Comparison, Line) ->
     case row_compare(Keys, DataRow, TableRow, Comparison) of

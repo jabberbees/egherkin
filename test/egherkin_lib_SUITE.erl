@@ -149,7 +149,7 @@ datatable_to_iolist_3_1_line_highlighted(_) ->
         "| foo | bar | foobar |\n"
         "> foo | bar | foobar <\n"
         "| foo | bar | foobar |"
-    >>, iolist_to_binary(egherkin_lib:datatable_to_iolist(Table, 2, undefined))).
+    >>, iolist_to_binary(egherkin_lib:datatable_to_iolist(Table, 1, undefined))).
 
 datatable_to_iolist_3_1_cell_highlighted(_) ->
     Table = egherkin_datatable:new([<<"a">>, <<"b">>, <<"c">>], [
@@ -162,7 +162,7 @@ datatable_to_iolist_3_1_cell_highlighted(_) ->
         "| foo | bar | foobar |\n"
         "> foo < bar | foobar |\n"
         "| foo | bar | foobar |"
-    >>, iolist_to_binary(egherkin_lib:datatable_to_iolist(Table, 2, <<"a">>))).
+    >>, iolist_to_binary(egherkin_lib:datatable_to_iolist(Table, 1, <<"a">>))).
 
 %%endregion
 
