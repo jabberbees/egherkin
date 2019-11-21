@@ -32,11 +32,24 @@ all() -> [
     rows_map_1_works,
     rows_map_2_works,
 
+    replace_rows_2_works,
+
+    replace_rows_3_projection_fun_1,
+    replace_rows_3_projection_fun_2,
+
     are_equal_returns_true,
     are_equal_returns_false,
 
     are_equal_unordered_returns_true,
     are_equal_unordered_returns_false,
+
+    matches_3_returns_nomatch_a_shorter_than_b,
+    matches_3_returns_nomatch_a_longer_than_b,
+    matches_3_returns_match_comparison_fun_2,
+    matches_3_returns_nomatch_comparison_fun_2,
+    matches_3_returns_match_comparison_fun_3,
+    matches_3_returns_nomatch_comparison_fun_3,
+    matches_3_returns_nomatch_with_key_comparison_fun_3,
 
     matches_4_returns_match_projection_fun_1,
     matches_4_returns_match_projection_fun_2,
@@ -195,6 +208,201 @@ are_equal_unordered_returns_false(_) ->
 
 %%endregion
 
+%%region replace_rows/2
+
+replace_rows_2_works(_) ->
+    Keys = [<<"a">>, <<"b">>, <<"c">>],
+    Rows = [
+        [<<"1">>, <<"true">>, <<"foobar">>],
+        [<<"2">>, <<"true">>, <<"foobar">>],
+        [<<"3">>, <<"true">>, <<"foobar">>]
+    ],
+    DataTable = egherkin_datatable:new(Keys, Rows),
+    NewRows = [
+        [<<"true">>, <<"foobar">>, <<"1">>],
+        [<<"true">>, <<"foobar">>, <<"2">>],
+        [<<"true">>, <<"foobar">>, <<"3">>]
+    ],
+    Expected = egherkin_datatable:new(Keys, NewRows),
+    Actual = egherkin_datatable:replace_rows(NewRows, DataTable),
+	?assertEqual(true, egherkin_datatable:are_equal(Expected, Actual)).
+
+%%endregion
+
+%%region replace_rows/3
+
+replace_rows_3_projection_fun_1(_) ->
+    Keys = [<<"a">>, <<"b">>, <<"c">>],
+    Rows = [
+        [<<"1">>, <<"true">>, <<"foobar">>],
+        [<<"2">>, <<"true">>, <<"foobar">>],
+        [<<"3">>, <<"true">>, <<"foobar">>]
+    ],
+    DataTable = egherkin_datatable:new(Keys, Rows),
+    Data = [
+        [<<"true">>, <<"foobar">>, <<"1">>],
+        [<<"true">>, <<"foobar">>, <<"2">>],
+        [<<"true">>, <<"foobar">>, <<"3">>]
+    ],
+    Projection = fun([B, C, A]) -> [A, B, C] end,
+    Expected = egherkin_datatable:new(Keys, Rows),
+    Actual = egherkin_datatable:replace_rows(Data, Projection, DataTable),
+	?assertEqual(true, egherkin_datatable:are_equal(Expected, Actual)).
+
+replace_rows_3_projection_fun_2(_) ->
+    Keys = [<<"a">>, <<"b">>, <<"c">>],
+    Rows = [
+        [<<"1">>, <<"true">>, <<"foobar">>],
+        [<<"2">>, <<"true">>, <<"foobar">>],
+        [<<"3">>, <<"true">>, <<"foobar">>]
+    ],
+    DataTable = egherkin_datatable:new(Keys, Rows),
+    Data = [
+        [{<<"a">>, <<"1">>}, {<<"b">>, <<"true">>}, {<<"c">>, <<"foobar">>}],
+        [{<<"a">>, <<"2">>}, {<<"b">>, <<"true">>}, {<<"c">>, <<"foobar">>}],
+        [{<<"a">>, <<"3">>}, {<<"b">>, <<"true">>}, {<<"c">>, <<"foobar">>}]
+    ],
+    Projection = fun(K, R) -> [proplists:get_value(I, R) || I <- K] end,
+    Expected = egherkin_datatable:new(Keys, Rows),
+    Actual = egherkin_datatable:replace_rows(Data, Projection, DataTable),
+	?assertEqual(true, egherkin_datatable:are_equal(Expected, Actual)).
+
+%%endregion
+
+%%region matches/3
+
+matches_3_returns_nomatch_a_shorter_than_b(_) ->
+    Keys = [<<"a">>, <<"b">>, <<"c">>],
+    RowsA = [
+        [<<"1">>, <<"true">>, <<"foobar">>],
+        [<<"2">>, <<"true">>, <<"foobar">>],
+        [<<"3">>, <<"true">>, <<"foobar">>]
+    ],
+    RowsB = [
+        [<<"1">>, <<"true">>, <<"foobar">>],
+        [<<"2">>, <<"true">>, <<"foobar">>],
+        [<<"3">>, <<"true">>, <<"foobar">>],
+        [<<"4">>, <<"true">>, <<"foobar">>]
+    ],
+    DTA = egherkin_datatable:new(Keys, RowsA),
+    DTB = egherkin_datatable:new(Keys, RowsB),
+    Comparison = fun(RowA, RowB) -> RowA =:= RowB end,
+	?assertEqual({nomatch, match, {row, 4}},
+        egherkin_datatable:matches(DTA, Comparison, DTB)).
+
+matches_3_returns_nomatch_a_longer_than_b(_) ->
+    Keys = [<<"a">>, <<"b">>, <<"c">>],
+    RowsA = [
+        [<<"1">>, <<"true">>, <<"foobar">>],
+        [<<"2">>, <<"true">>, <<"foobar">>],
+        [<<"3">>, <<"true">>, <<"foobar">>],
+        [<<"4">>, <<"true">>, <<"foobar">>]
+    ],
+    RowsB = [
+        [<<"1">>, <<"true">>, <<"foobar">>],
+        [<<"2">>, <<"true">>, <<"foobar">>],
+        [<<"3">>, <<"true">>, <<"foobar">>]
+    ],
+    DTA = egherkin_datatable:new(Keys, RowsA),
+    DTB = egherkin_datatable:new(Keys, RowsB),
+    Comparison = fun(RowA, RowB) -> RowA =:= RowB end,
+	?assertEqual({nomatch, {row, 4}, match},
+        egherkin_datatable:matches(DTA, Comparison, DTB)).
+
+matches_3_returns_match_comparison_fun_2(_) ->
+    Keys = [<<"a">>, <<"b">>, <<"c">>],
+    RowsA = [
+        [<<"1">>, <<"true">>, <<"foobar">>],
+        [<<"2">>, <<"true">>, <<"foobar">>],
+        [<<"3">>, <<"true">>, <<"foobar">>]
+    ],
+    RowsB = [
+        [<<"1">>, <<"true">>, <<"foobar">>],
+        [<<"2">>, <<"true">>, <<"foobar">>],
+        [<<"3">>, <<"true">>, <<"foobar">>]
+    ],
+    DTA = egherkin_datatable:new(Keys, RowsA),
+    DTB = egherkin_datatable:new(Keys, RowsB),
+    Comparison = fun(RowA, RowB) -> RowA =:= RowB end,
+	?assertEqual(match,
+        egherkin_datatable:matches(DTA, Comparison, DTB)).
+
+matches_3_returns_nomatch_comparison_fun_2(_) ->
+    Keys = [<<"a">>, <<"b">>, <<"c">>],
+    RowsA = [
+        [<<"1">>, <<"true">>, <<"foobar">>],
+        [<<"2">>, <<"true">>, <<"foobar">>],
+        [<<"3">>, <<"true">>, <<"foobar">>]
+    ],
+    RowsB = [
+        [<<"1">>, <<"true">>, <<"foobar">>],
+        [<<"2">>, <<"false">>, <<"foobar">>],
+        [<<"3">>, <<"true">>, <<"foobar">>]
+    ],
+    DTA = egherkin_datatable:new(Keys, RowsA),
+    DTB = egherkin_datatable:new(Keys, RowsB),
+    Comparison = fun(RowA, RowB) -> RowA =:= RowB end,
+	?assertEqual({nomatch, {row, 2}},
+        egherkin_datatable:matches(DTA, Comparison, DTB)).
+
+matches_3_returns_match_comparison_fun_3(_) ->
+    Keys = [<<"a">>, <<"b">>, <<"c">>],
+    Rows = [
+        [<<"1">>, <<"true">>, <<"foobar">>],
+        [<<"2">>, <<"true">>, <<"foobar">>],
+        [<<"3">>, <<"true">>, <<"foobar">>]
+    ],
+    DTA = egherkin_datatable:new(Keys, Rows),
+    DTB = egherkin_datatable:new(Keys, Rows),
+    Comparison = fun(K, RowA, RowB) -> K =:= Keys andalso RowA =:= RowB end,
+	?assertEqual(match,
+        egherkin_datatable:matches(DTA, Comparison, DTB)).
+
+matches_3_returns_nomatch_comparison_fun_3(_) ->
+    Keys = [<<"a">>, <<"b">>, <<"c">>],
+    RowsA = [
+        [<<"1">>, <<"true">>, <<"foobar">>],
+        [<<"2">>, <<"true">>, <<"foobar">>],
+        [<<"3">>, <<"true">>, <<"foobar">>]
+    ],
+    RowsB = [
+        [<<"1">>, <<"true">>, <<"foobar">>],
+        [<<"2">>, <<"false">>, <<"foobar">>],
+        [<<"3">>, <<"true">>, <<"foobar">>]
+    ],
+    DTA = egherkin_datatable:new(Keys, RowsA),
+    DTB = egherkin_datatable:new(Keys, RowsB),
+    Comparison = fun
+    (K, R, R) when K =:= Keys -> match;
+    (_, _, _) -> nomatch
+    end,
+	?assertEqual({nomatch, {row, 2}},
+        egherkin_datatable:matches(DTA, Comparison, DTB)).
+
+matches_3_returns_nomatch_with_key_comparison_fun_3(_) ->
+    Keys = [<<"a">>, <<"b">>, <<"c">>],
+    RowsA = [
+        [<<"1">>, <<"true">>, <<"foobar">>],
+        [<<"2">>, <<"true">>, <<"foobar">>],
+        [<<"3">>, <<"true">>, <<"foobar">>]
+    ],
+    RowsB = [
+        [<<"1">>, <<"true">>, <<"foobar">>],
+        [<<"2">>, <<"false">>, <<"foobar">>],
+        [<<"3">>, <<"true">>, <<"foobar">>]
+    ],
+    DTA = egherkin_datatable:new(Keys, RowsA),
+    DTB = egherkin_datatable:new(Keys, RowsB),
+    Comparison = fun
+    (K, R, R) when K =:= Keys -> match;
+    (_, [<<"2">>, <<"true">>, <<"foobar">>], [<<"2">>, <<"false">>, <<"foobar">>]) -> {nomatch, <<"b">>};
+    (_, _, _) -> nomatch
+    end,
+	?assertEqual({nomatch, {row, 2, <<"b">>}},
+        egherkin_datatable:matches(DTA, Comparison, DTB)).
+
+%%endregion
+
 %%region matches/4
 
 matches_4_returns_match_projection_fun_1(_) ->
@@ -266,7 +474,7 @@ matches_4_returns_nomatch_comparison_fun_2(_) ->
     ],
     Projection = fun(Row) -> Row end,
     Comparison = fun(RowA, RowB) -> RowA =:= RowB end,
-	?assertEqual({nomatch, 1},
+	?assertEqual({nomatch, {row, 2}},
         egherkin_datatable:matches(Data, Projection, Comparison, DataTable)).
 
 matches_4_returns_match_comparison_fun_3(_) ->
@@ -305,7 +513,7 @@ matches_4_returns_nomatch_comparison_fun_3(_) ->
     (_, R, R) -> match;
     (_, _, _) -> nomatch
     end,
-	?assertEqual({nomatch, 1},
+	?assertEqual({nomatch, {row, 2}},
         egherkin_datatable:matches(Data, Projection, Comparison, DataTable)).
 
 matches_4_returns_nomatch_with_key_comparison_fun_3(_) ->
@@ -326,7 +534,7 @@ matches_4_returns_nomatch_with_key_comparison_fun_3(_) ->
     (_, R, R) -> match;
     (_, _, _) -> {nomatch, <<"b">>}
     end,
-	?assertEqual({nomatch, 1, <<"b">>},
+	?assertEqual({nomatch, {row, 2, <<"b">>}},
         egherkin_datatable:matches(Data, Projection, Comparison, DataTable)).
 
 matches_4_returns_match_json_list(_) ->
@@ -362,7 +570,7 @@ matches_4_returns_nomatch_with_key_json_list(_) ->
     ],
     Projection = lists:duplicate(3, fun proplists:get_value/2),
     Comparison = lists:duplicate(3, fun match_json_value/2),
-	?assertEqual({nomatch, 1, <<"b">>},
+	?assertEqual({nomatch, {row, 2, <<"b">>}},
         egherkin_datatable:matches(Data, Projection, Comparison, DataTable)).
 
 %%endregion

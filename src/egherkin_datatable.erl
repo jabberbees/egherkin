@@ -22,8 +22,14 @@
     rows/1,
     rows_as_proplists/1,
     rows_map/2,
+
+    replace_rows/2,
+    replace_rows/3,
+
     are_equal/2,
     are_equal_unordered/2,
+
+    matches/3,
     matches/4
 ]).
 
@@ -50,6 +56,13 @@ rows_map(Fun, DataTable) when is_function(Fun, 2) ->
     Keys = keys(DataTable),
     [Fun(Keys, Row) || Row <- rows(DataTable)].
 
+replace_rows(Rows, #datatable{keys = Keys}) ->
+    new(Keys, Rows).
+
+replace_rows(Data, Projection, #datatable{keys = Keys}) ->
+    Rows = project_data(Keys, Data, Projection),
+    new(Keys, Rows).
+
 are_equal(DT1, DT2) ->
     K1 = keys(DT1),
     K2 = keys(DT2),
@@ -64,21 +77,30 @@ are_equal_unordered(DT1, DT2) ->
     R2 = lists:sort(rows(DT2)),
     K1 =:= K2 andalso R1 =:= R2.
 
-matches(Data, Projection, Comparison,
-        #datatable{keys = Keys, rows = Rows}) ->
-    DataRows = project_data(Keys, Data, Projection),
-    match_rows(DataRows, Rows, Keys, Comparison, 0).
+matches(#datatable{keys = Keys, rows = RowsA}, Comparison,
+        #datatable{keys = Keys, rows = RowsB}) ->
+    match_rows(RowsA, RowsB, Keys, Comparison, 1);
+matches(_, _, _) ->
+    {nomatch, keys}.
+
+matches(Data, Projection, Comparison, DTB) ->
+    DTA = replace_rows(Data, Projection, DTB),
+    matches(DTA, Comparison, DTB).
 
 match_rows([DataRow | DataMore], [TableRow | TableMore], Keys, Comparison, Line) ->
     case row_compare(Keys, DataRow, TableRow, Comparison) of
     true -> match_rows(DataMore, TableMore, Keys, Comparison, Line+1);
     match -> match_rows(DataMore, TableMore, Keys, Comparison, Line+1);
-    false -> {nomatch, Line};
-    nomatch -> {nomatch, Line};
-    {nomatch, Key} -> {nomatch, Line, Key}
+    false -> {nomatch, {row, Line}};
+    nomatch -> {nomatch, {row, Line}};
+    {nomatch, Key} -> {nomatch, {row, Line, Key}}
     end;
-match_rows([], _, _, _, _) ->
-    match.
+match_rows([], [], _, _, _) ->
+    match;
+match_rows([], _, _, _, Line) ->
+    {nomatch, match, {row, Line}};
+match_rows(_, [], _, _, Line) ->
+    {nomatch, {row, Line}, match}.
 
 project_data(_Keys, Data, Fun) when is_function(Fun, 1) ->
     lists:map(Fun, Data);
