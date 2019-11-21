@@ -21,10 +21,7 @@
 	
 	format_step_parts/1,
 
-	datatable_to_iolist/1,
-    datatable_to_iolist/2,
 	datatable_to_iolist/3,
-    datatable_to_iolist/4,
 
 	format_table_line/3,
 	format_table_line/4,
@@ -53,7 +50,8 @@ format_step_parts([{docstring, Lines} | More], Result) ->
 	end, [Docstring, <<"\n">> | Result], Lines),
 	format_step_parts(More, [Docstring, NL | Result2]);
 format_step_parts([DataTable | More], Result) when element(1, DataTable) =:= datatable ->
-	format_step_parts(More, [datatable_to_iolist(DataTable), <<"\n">> | Result]);
+	IoList = datatable_to_iolist(DataTable, none, default_opts()),
+	format_step_parts(More, [IoList, <<"\n">> | Result]);
 format_step_parts([Part | More], Result) ->
 	format_step_parts(More, [Part, <<" ">> | Result]);
 format_step_parts([], Result) ->
@@ -78,16 +76,7 @@ format_step_parts([], Result) ->
 	new_line
 }).
 
-datatable_to_iolist(DataTable) ->
-    datatable_to_iolist(DataTable, undefined, undefined, default_opts()).
-
-datatable_to_iolist(DataTable, Opts) ->
-	datatable_to_iolist(DataTable, undefined, undefined, Opts).
-
-datatable_to_iolist(DataTable, HighlightLine, HighlightKey) ->
-	datatable_to_iolist(DataTable, HighlightLine, HighlightKey, default_opts()).
-
-datatable_to_iolist(DataTable, HighlightLine, HighlightKey, Opts) ->
+datatable_to_iolist(DataTable, Highlight, Opts) ->
 	case egherkin_datatable:keys(DataTable) of
 	[] ->
 		#options{start_sep = Start, end_sep = End} = Opts,
@@ -99,21 +88,22 @@ datatable_to_iolist(DataTable, HighlightLine, HighlightKey, Opts) ->
 		end, lists:duplicate(length(Keys), 0), Rows),
 		NL = Opts#options.new_line,
 		{_, FormattedLines} = lists:foldl(fun(Row, {CurLine, Acc}) ->
-			FTL = case CurLine of
-			HighlightLine ->
-				if is_binary(HighlightKey) andalso byte_size(HighlightKey) > 0 ->
-					Highlights = highlights(Keys, HighlightKey, []),
-					format_table_line(Row, Widths, Highlights, Opts);
-				true ->
-					format_table_line(Row, Widths, line, Opts)
-				end;
+			FTL = case Highlight of
+			{row, CurLine} ->
+				format_table_line(Row, Widths, line, Opts);
+			{row, CurLine, HighlightKey} ->
+				Highlights = highlights(Keys, HighlightKey, []),
+				format_table_line(Row, Widths, Highlights, Opts);
 			_ ->
 				format_table_line(Row, Widths, Opts)
 			end,
 			{CurLine+1, [FTL, NL | Acc]}
-		end, {0, []}, Rows),
+		end, {1, []}, Rows),
 		[
-			format_table_line(Keys, Widths, Opts),
+			case Highlight of
+			keys -> format_table_line(Keys, Widths, line, Opts);
+			_    -> format_table_line(Keys, Widths, Opts)
+			end,
 			lists:reverse(FormattedLines)
 		]
 	end.
