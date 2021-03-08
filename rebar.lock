@@ -1,1 +1,16 @@
-[].
+[{<<"cedb">>,
+  {git,"https://github.com/hachreak/cedb.git",
+       {ref,"b1b4768c3d8b954d339a607e202dcceb757b71b3"}},
+  0},
+ {<<"color">>,
+  {git,"https://github.com/julianduque/erlang-color.git",
+       {ref,"2e538a3360cfdf47906929a04b9471a1f5320afe"}},
+  1},
+ {<<"mock_io">>,
+  {git,"https://github.com/marco-m/mock_io.git",
+       {ref,"cb30048ffba50d12bd4ee94472c992aa6a23cc65"}},
+  0},
+ {<<"sf">>,
+  {git,"https://github.com/hachreak/sf.git",
+       {ref,"80d7652e11bdcd7d751f8280f071fb0e7c2f6261"}},
+  1}].

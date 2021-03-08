@@ -1,9 +1,7 @@
 %% Copyright (c) 2018, Jabberbees SAS
-
 %% Permission to use, copy, modify, and/or distribute this software for any
 %% purpose with or without fee is hereby granted, provided that the above
 %% copyright notice and this permission notice appear in all copies.
-
 %% THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
 %% WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
 %% MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
@@ -11,26 +9,16 @@
 %% WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 %% ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 %% OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
 %% @author Emmanuel Boutin <emmanuel.boutin@jabberbees.com>
 
 -module(egherkin_scenario).
 
--export([
-  name/1,
-  tags/1,
-  tag_names/1,
-  steps/1
-]).
+-export([name/1, tags/1, tag_names/1, steps/1]).
 
-name(Scenario) ->
-  element(2, Scenario).
+name(Scenario) -> element(2, Scenario).
 
-tags(Scenario) ->
-  element(3, Scenario).
+tags(Scenario) -> element(3, Scenario).
 
-tag_names(Scenario) ->
-  [Name || {_, Name} <- tags(Scenario)].
+tag_names(Scenario) -> [Name || {_, Name} <- tags(Scenario)].
 
-steps(Scenario) ->
-  element(4, Scenario).
+steps(Scenario) -> element(4, Scenario).
