@@ -35,7 +35,7 @@ end_per_testcase(_TestCase, Config) ->
 
 all() -> [
 	name_works,
-    
+
     tags_works,
 
 	tag_names_works,

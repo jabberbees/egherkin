@@ -25,7 +25,7 @@ all() -> [
     new_2_works,
 
     keys_works,
-    
+
     rows_works,
 
     rows_as_valuesproplists,
@@ -579,9 +579,9 @@ matches_4_returns_nomatch_with_key_json_list(_) ->
 %%region helpers
 
 match_json_value(DV, TV) when is_integer(DV) ->
-    binary_to_integer(TV) == DV; 
+    binary_to_integer(TV) == DV;
 match_json_value(DV, TV) when is_float(DV) ->
-    binary_to_float(TV) == DV; 
+    binary_to_float(TV) == DV;
 match_json_value(DV, TV) when is_atom(DV) ->
     TV == list_to_binary(atom_to_list(DV));
 match_json_value(DV, TV) when is_list(DV) ->
