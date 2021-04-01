@@ -16,15 +16,16 @@
 
 -module(egherkin_datatable_SUITE).
 -compile(export_all).
+-compile(nowarn_export_all).
 
 -include_lib("common_test/include/ct.hrl").
--include_lib("assert.hrl").
+-include_lib("stdlib/include/assert.hrl").
 
 all() -> [
     new_2_works,
 
     keys_works,
-    
+
     rows_works,
 
     rows_as_valuesproplists,
@@ -578,9 +579,9 @@ matches_4_returns_nomatch_with_key_json_list(_) ->
 %%region helpers
 
 match_json_value(DV, TV) when is_integer(DV) ->
-    binary_to_integer(TV) == DV; 
+    binary_to_integer(TV) == DV;
 match_json_value(DV, TV) when is_float(DV) ->
-    binary_to_float(TV) == DV; 
+    binary_to_float(TV) == DV;
 match_json_value(DV, TV) when is_atom(DV) ->
     TV == list_to_binary(atom_to_list(DV));
 match_json_value(DV, TV) when is_list(DV) ->

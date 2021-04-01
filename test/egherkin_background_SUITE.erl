@@ -16,9 +16,10 @@
 
 -module(egherkin_background_SUITE).
 -compile(export_all).
+-compile(nowarn_export_all).
 
 -include_lib("common_test/include/ct.hrl").
--include_lib("assert.hrl").
+-include_lib("stdlib/include/assert.hrl").
 
 init_per_suite(Config) ->
 	Config.

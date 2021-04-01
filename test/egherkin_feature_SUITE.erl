@@ -16,9 +16,10 @@
 
 -module(egherkin_feature_SUITE).
 -compile(export_all).
+-compile(nowarn_export_all).
 
 -include_lib("common_test/include/ct.hrl").
--include_lib("assert.hrl").
+-include_lib("stdlib/include/assert.hrl").
 
 init_per_suite(Config) ->
 	Config.
@@ -34,7 +35,7 @@ end_per_testcase(_TestCase, Config) ->
 
 all() -> [
 	name_works,
-    
+
 	tags_works,
 
 	tag_names_works,

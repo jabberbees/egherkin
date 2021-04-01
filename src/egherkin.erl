@@ -16,7 +16,7 @@
 
 -module(egherkin).
 
--export([lexer/1, from_lexer/1, parse/1, parse_file/1]).
+-export([lexer/1, lexer/2, from_lexer/1, parse/1, parse_file/1]).
 
 -define(is_gwt(V), ((V == given_keyword)
   orelse (V == when_keyword)
@@ -28,75 +28,88 @@
 
 -define(is_crlf(C), ((C == $\r) orelse (C == $\n))).
 
+%% @doc assumes that the file source data have
 lexer(Source) ->
-  lexer(Source, {keepwhite, <<>>}, []).
+  lexer(Source, io_lib:nl() =:= "\n").
 
-lexer(<<>>, _Text, Result) ->
+lexer(Source, WindowsNewLine) ->
+  lexer(Source, {keepwhite, <<>>}, [], WindowsNewLine).
+
+lexer(<<>>, _Text, Result, _NewLine) ->
   lists:reverse(Result);
 
-lexer(<<$#, S/binary>>, {keepwhite, _White}, Result) ->
-  lexer(S, skipcomment, Result);
-lexer(<<"Feature:", S/binary>>, {keepwhite, _White}, Result) ->
-  lexer(S, skipwhite, [feature_keyword | Result]);
-lexer(<<"Background:", S/binary>>, {keepwhite, _White}, Result) ->
-  lexer(S, skipwhite, [background_keyword | Result]);
-lexer(<<"Scenario Outline:", S/binary>>, {keepwhite, _White}, Result) ->
-  lexer(S, skipwhite, [scenario_outline_keyword | Result]);
-lexer(<<"Scenario:", S/binary>>, {keepwhite, _White}, Result) ->
-  lexer(S, skipwhite, [scenario_keyword | Result]);
-lexer(<<"Examples:", S/binary>>, {keepwhite, _White}, Result) ->
-  lexer(S, skipwhite, [examples_keyword | Result]);
-lexer(<<"Given", S/binary>>, {keepwhite, _White}, Result) ->
-  lexer(S, skipwhite, [given_keyword | Result]);
-lexer(<<"When", S/binary>>, {keepwhite, _White}, Result) ->
-  lexer(S, skipwhite, [when_keyword | Result]);
-lexer(<<"Then", S/binary>>, {keepwhite, _White}, Result) ->
-  lexer(S, skipwhite, [then_keyword | Result]);
-lexer(<<"And", S/binary>>, {keepwhite, _White}, Result) ->
-  lexer(S, skipwhite, [and_keyword | Result]);
-lexer(<<"But", S/binary>>, {keepwhite, _White}, Result) ->
-  lexer(S, skipwhite, [but_keyword | Result]);
-lexer(<<"\"\"\"", S/binary>>, {keepwhite, _White}, Result) ->
-  lexer(S, skipwhite, [docstring_keyword | Result]);
-lexer(<<$@, S/binary>>, {keepwhite, _White}, Result) ->
-  lexer(S, skipwhite, [at_sign | Result]);
-lexer(<<"\r\n", S/binary>>, {keepwhite, _White}, Result) ->
-  lexer(S, {keepwhite, <<>>}, [crlf | Result]);
-lexer(<<C, S/binary>>, {keepwhite, _White}, Result) when ?is_crlf(C) ->
-  lexer(S, {keepwhite, <<>>}, [crlf | Result]);
-lexer(<<C, S/binary>>, {keepwhite, White}, Result) when ?is_white(C) ->
-  lexer(S, {keepwhite, <<White/binary, C>>}, Result);
-lexer(<<C, S/binary>>, {keepwhite, _White}, Result) ->
-  lexer(S, {keeptext, <<C>>, <<>>}, Result);
+lexer(<<$#, S/binary>>, {keepwhite, _White}, Result, NewLine) ->
+  lexer(S, skipcomment, Result, NewLine);
+lexer(<<"Feature:", S/binary>>, {keepwhite, _White}, Result, NewLine) ->
+  lexer(S, skipwhite, [feature_keyword | Result], NewLine);
+lexer(<<"Background:", S/binary>>, {keepwhite, _White}, Result, NewLine) ->
+  lexer(S, skipwhite, [background_keyword | Result], NewLine);
+lexer(<<"Scenario Outline:", S/binary>>, {keepwhite, _White}, Result, NewLine) ->
+  lexer(S, skipwhite, [scenario_outline_keyword | Result], NewLine);
+lexer(<<"Scenario:", S/binary>>, {keepwhite, _White}, Result, NewLine) ->
+  lexer(S, skipwhite, [scenario_keyword | Result], NewLine);
+lexer(<<"Examples:", S/binary>>, {keepwhite, _White}, Result, NewLine) ->
+  lexer(S, skipwhite, [examples_keyword | Result], NewLine);
+lexer(<<"Given", S/binary>>, {keepwhite, _White}, Result, NewLine) ->
+  lexer(S, skipwhite, [given_keyword | Result], NewLine);
+lexer(<<"When", S/binary>>, {keepwhite, _White}, Result, NewLine) ->
+  lexer(S, skipwhite, [when_keyword | Result], NewLine);
+lexer(<<"Then", S/binary>>, {keepwhite, _White}, Result, NewLine) ->
+  lexer(S, skipwhite, [then_keyword | Result], NewLine);
+lexer(<<"And", S/binary>>, {keepwhite, _White}, Result, NewLine) ->
+  lexer(S, skipwhite, [and_keyword | Result], NewLine);
+lexer(<<"But", S/binary>>, {keepwhite, _White}, Result, NewLine) ->
+  lexer(S, skipwhite, [but_keyword | Result], NewLine);
+lexer(<<"\"\"\"", S/binary>>, {keepwhite, _White}, Result, NewLine) ->
+  lexer(S, skipwhite, [docstring_keyword | Result], NewLine);
+lexer(<<$@, S/binary>>, {keepwhite, _White}, Result, NewLine) ->
+  lexer(S, skipwhite, [at_sign | Result], NewLine);
 
-lexer(<<"\r\n", S/binary>>, skipcomment, Result) ->
-  lexer(S, {keepwhite, <<>>}, [crlf | Result]);
-lexer(<<C, S/binary>>, skipcomment, Result) when ?is_crlf(C) ->
-  lexer(S, {keepwhite, <<>>}, [crlf | Result]);
-lexer(<<_, S/binary>>, skipcomment, Result) ->
-  lexer(S, skipcomment, Result);
+lexer(<<"\r\n", S/binary>>, {keepwhite, _White}, Result, true=NewLine) ->
+  lexer(S, {keepwhite, <<>>}, [crlf | Result], NewLine);
+lexer(<<"\n", S/binary>>, {keepwhite, _White}, Result, false=NewLine) ->
+  lexer(S, {keepwhite, <<>>}, [crlf | Result], NewLine);
+lexer(<<C, S/binary>>, {keepwhite, _White}, Result, NewLine) when ?is_crlf(C) ->
+  lexer(S, {keepwhite, <<>>}, [crlf | Result], NewLine);
+lexer(<<C, S/binary>>, {keepwhite, White}, Result, NewLine) when ?is_white(C) ->
+  lexer(S, {keepwhite, <<White/binary, C>>}, Result, NewLine);
+lexer(<<C, S/binary>>, {keepwhite, _White}, Result, NewLine) ->
+  lexer(S, {keeptext, <<C>>, <<>>}, Result, NewLine);
 
-lexer(<<"\r\n", S/binary>>, skipwhite, Result) ->
-  lexer(S, {keepwhite, <<>>}, [crlf | Result]);
-lexer(<<C, S/binary>>, skipwhite, Result) when ?is_crlf(C) ->
-  lexer(S, {keepwhite, <<>>}, [crlf | Result]);
-lexer(<<C, S/binary>>, skipwhite, Result) when ?is_white(C) ->
-  lexer(S, skipwhite, Result);
-lexer(<<C, S/binary>>, skipwhite, Result) ->
-  lexer(S, {keeptext, <<C>>, <<>>}, Result);
+lexer(<<"\r\n", S/binary>>, skipcomment, Result, true=NewLine) ->
+  lexer(S, {keepwhite, <<>>}, [crlf | Result], NewLine);
+lexer(<<"\n", S/binary>>, skipcomment, Result, false=NewLine) ->
+  lexer(S, {keepwhite, <<>>}, [crlf | Result], NewLine);
+lexer(<<C, S/binary>>, skipcomment, Result, NewLine) when ?is_crlf(C) ->
+  lexer(S, {keepwhite, <<>>}, [crlf | Result], NewLine);
+lexer(<<_, S/binary>>, skipcomment, Result, NewLine) ->
+  lexer(S, skipcomment, Result, NewLine);
 
-lexer(<<"\r\n", S/binary>>, {keeptext, Text, _White}, Result) ->
-  lexer(S, {keepwhite, <<>>}, [crlf, Text | Result]);
-lexer(<<C, S/binary>>, {keeptext, Text, _White}, Result) when ?is_crlf(C) ->
-  lexer(S, <<>>, [crlf, Text | Result]);
-lexer(<<$@, S/binary>>, {keeptext, <<>>, _White}, Result) ->
-  lexer(S, skipwhite, [at_sign | Result]);
-lexer(<<$@, S/binary>>, {keeptext, Text, _White}, Result) ->
-  lexer(S, skipwhite, [at_sign, Text | Result]);
-lexer(<<C, S/binary>>, {keeptext, Text, White}, Result) when ((C == $\s) orelse (C == $\t)) ->
-  lexer(S, {keeptext, Text, <<White/binary, C>>}, Result);
-lexer(<<C, S/binary>>, {keeptext, Text, White}, Result) ->
-  lexer(S, {keeptext, <<Text/binary, White/binary, C>>, <<>>}, Result).
+lexer(<<"\r\n", S/binary>>, skipwhite, Result, true=NewLine) ->
+  lexer(S, {keepwhite, <<>>}, [crlf | Result], NewLine);
+lexer(<<"\n", S/binary>>, skipwhite, Result, false=NewLine) ->
+  lexer(S, {keepwhite, <<>>}, [crlf | Result], NewLine);
+lexer(<<C, S/binary>>, skipwhite, Result, NewLine) when ?is_crlf(C) ->
+  lexer(S, {keepwhite, <<>>}, [crlf | Result], NewLine);
+lexer(<<C, S/binary>>, skipwhite, Result, NewLine) when ?is_white(C) ->
+  lexer(S, skipwhite, Result, NewLine);
+lexer(<<C, S/binary>>, skipwhite, Result, NewLine) ->
+  lexer(S, {keeptext, <<C>>, <<>>}, Result, NewLine);
+
+lexer(<<"\r\n", S/binary>>, {keeptext, Text, _White}, Result, true=NewLine) ->
+  lexer(S, {keepwhite, <<>>}, [crlf, Text | Result], NewLine);
+lexer(<<"\n", S/binary>>, {keeptext, Text, _White}, Result, false=NewLine) ->
+  lexer(S, {keepwhite, <<>>}, [crlf, Text | Result], NewLine);
+lexer(<<C, S/binary>>, {keeptext, Text, _White}, Result, NewLine) when ?is_crlf(C) ->
+  lexer(S, <<>>, [crlf, Text | Result], NewLine);
+lexer(<<$@, S/binary>>, {keeptext, <<>>, _White}, Result, NewLine) ->
+  lexer(S, skipwhite, [at_sign | Result], NewLine);
+lexer(<<$@, S/binary>>, {keeptext, Text, _White}, Result, NewLine) ->
+  lexer(S, skipwhite, [at_sign, Text | Result], NewLine);
+lexer(<<C, S/binary>>, {keeptext, Text, White}, Result, NewLine) when ((C == $\s) orelse (C == $\t)) ->
+  lexer(S, {keeptext, Text, <<White/binary, C>>}, Result, NewLine);
+lexer(<<C, S/binary>>, {keeptext, Text, White}, Result, NewLine) ->
+  lexer(S, {keeptext, <<Text/binary, White/binary, C>>, <<>>}, Result, NewLine).
 
 from_lexer(L) ->
   Parsers = [
@@ -145,10 +158,8 @@ parse_tags(L, Line, Tags) ->
   {lists:reverse(Tags), L, Line}.
 
 parse_feature_line([feature_keyword, Name, crlf | L], Line) when is_binary(Name) ->
-  case parse_comments(L, Line+1) of
-  {failed, _, _} = Failed -> Failed;
-  {Comments, L2, Line2} -> {{Name, Comments}, L2, Line2}
-  end;
+  {Comments, L2, Line2} = parse_comments(L, Line + 1),
+  {{Name, Comments}, L2, Line2};
 parse_feature_line(_, Line) ->
   {failed, Line, "expected 'Feature:' keyword"}.
 
