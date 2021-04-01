@@ -25,3 +25,9 @@ jobs:
         name: Check
       - run: rebar3 do eunit, ct
         name: Test
+      - run: make distclean
+        name: Clean
+      - run: make
+        name: Compile (Erlang.mk)
+      - run: make ct
+        name: Test (Erlang.mk)
