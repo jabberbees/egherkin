@@ -145,10 +145,8 @@ parse_tags(L, Line, Tags) ->
   {lists:reverse(Tags), L, Line}.
 
 parse_feature_line([feature_keyword, Name, crlf | L], Line) when is_binary(Name) ->
-  case parse_comments(L, Line+1) of
-  {failed, _, _} = Failed -> Failed;
-  {Comments, L2, Line2} -> {{Name, Comments}, L2, Line2}
-  end;
+  {Comments, L2, Line2} = parse_comments(L, Line + 1),
+  {{Name, Comments}, L2, Line2};
 parse_feature_line(_, Line) ->
   {failed, Line, "expected 'Feature:' keyword"}.
 
