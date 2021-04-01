@@ -1,0 +1,12 @@
+{application, egherkin,
+ [{description, "Library for parsing Gherkin documents"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {applications,
+   [kernel,
+    stdlib
+   ]},
+  {env,[]},
+  {modules, []},
+  {links, []}
+ ]}.
