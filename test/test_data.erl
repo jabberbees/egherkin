@@ -16,6 +16,7 @@
 
 -module(test_data).
 -compile(export_all).
+-compile(nowarn_export_all).
 
 source(simple_scenario) ->
 	<<
