@@ -1,4 +1,4 @@
-# egherkin
+# egherkin [CI Status](https://github.com/jabberbees/egherkin/workflows/CI/badge.svg)
 egherkin is an Erlang library for parsing Gherkin documents.
 
 ## Goals
