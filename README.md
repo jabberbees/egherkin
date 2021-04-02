@@ -50,4 +50,4 @@ To run tests:
     DataTableRow = [Value :: binary()]
 
 ## Compatibility
-egherkin was developed and tested with **Erlang/OTP R16B03-1**.
+egherkin is tested against Erlang OTP version 19, 20, 21, 22, 23, 24.
