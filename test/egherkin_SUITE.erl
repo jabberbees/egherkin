@@ -35,6 +35,7 @@ end_per_testcase(_TestCase, Config) ->
 
 all() -> [
 	lexer_simple_scenario,
+	lexer_simple_scenario_linux,
 	lexer_background,
 	lexer_datatable_step,
 	lexer_docstring_step,
@@ -71,6 +72,12 @@ all() -> [
 lexer_simple_scenario(_) ->
 	Scenario = simple_scenario,
 	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario))),
+	ok.
+
+lexer_simple_scenario_linux(_) ->
+	InputScenario = simple_scenario_linux,
+	Scenario = simple_scenario,
+	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(InputScenario))),
 	ok.
 
 lexer_background(_) ->

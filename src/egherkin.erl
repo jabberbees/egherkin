@@ -62,6 +62,8 @@ lexer(<<$@, S/binary>>, {keepwhite, _White}, Result) ->
   lexer(S, skipwhite, [at_sign | Result]);
 lexer(<<"\r\n", S/binary>>, {keepwhite, _White}, Result) ->
   lexer(S, {keepwhite, <<>>}, [crlf | Result]);
+lexer(<<"\n", S/binary>>, {keepwhite, _White}, Result) ->
+  lexer(S, {keepwhite, <<>>}, [crlf | Result]);
 lexer(<<C, S/binary>>, {keepwhite, _White}, Result) when ?is_crlf(C) ->
   lexer(S, {keepwhite, <<>>}, [crlf | Result]);
 lexer(<<C, S/binary>>, {keepwhite, White}, Result) when ?is_white(C) ->
@@ -71,12 +73,16 @@ lexer(<<C, S/binary>>, {keepwhite, _White}, Result) ->
 
 lexer(<<"\r\n", S/binary>>, skipcomment, Result) ->
   lexer(S, {keepwhite, <<>>}, [crlf | Result]);
+lexer(<<"\n", S/binary>>, skipcomment, Result) ->
+  lexer(S, {keepwhite, <<>>}, [crlf | Result]);
 lexer(<<C, S/binary>>, skipcomment, Result) when ?is_crlf(C) ->
   lexer(S, {keepwhite, <<>>}, [crlf | Result]);
 lexer(<<_, S/binary>>, skipcomment, Result) ->
   lexer(S, skipcomment, Result);
 
 lexer(<<"\r\n", S/binary>>, skipwhite, Result) ->
+  lexer(S, {keepwhite, <<>>}, [crlf | Result]);
+lexer(<<"\n", S/binary>>, skipwhite, Result) ->
   lexer(S, {keepwhite, <<>>}, [crlf | Result]);
 lexer(<<C, S/binary>>, skipwhite, Result) when ?is_crlf(C) ->
   lexer(S, {keepwhite, <<>>}, [crlf | Result]);
@@ -86,6 +92,8 @@ lexer(<<C, S/binary>>, skipwhite, Result) ->
   lexer(S, {keeptext, <<C>>, <<>>}, Result);
 
 lexer(<<"\r\n", S/binary>>, {keeptext, Text, _White}, Result) ->
+  lexer(S, {keepwhite, <<>>}, [crlf, Text | Result]);
+lexer(<<"\n", S/binary>>, {keeptext, Text, _White}, Result) ->
   lexer(S, {keepwhite, <<>>}, [crlf, Text | Result]);
 lexer(<<C, S/binary>>, {keeptext, Text, _White}, Result) when ?is_crlf(C) ->
   lexer(S, <<>>, [crlf, Text | Result]);
