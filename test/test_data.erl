@@ -27,15 +27,6 @@ source(simple_scenario) ->
 		"When I press add\r\n"
 		"Then the result should be 120 on the screen\r\n"
 	>>;
-source(simple_scenario_linux) ->
-	<<
-		"Feature: Addition\n"
-		"Scenario: Add two numbers\n"
-		"Given I have entered 50 into the calculator\n"
-		"And I have entered 70 into the calculator\n"
-		"When I press add\n"
-		"Then the result should be 120 on the screen\n"
-	>>;
 source(background) ->
 	<<
 		"Feature: Addition\r\n"
