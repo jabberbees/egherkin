@@ -71,58 +71,58 @@ all() -> [
 
 lexer_simple_scenario(_) ->
 	Scenario = simple_scenario,
-	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario), true)),
+	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario))),
 	ok.
 
 lexer_simple_scenario_linux(_) ->
 	InputScenario = simple_scenario_linux,
 	Scenario = simple_scenario,
-	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(InputScenario), false)),
+	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(InputScenario))),
 	ok.
 
 lexer_background(_) ->
 	Scenario = background,
-	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario), true)),
+	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario))),
 	ok.
 
 lexer_datatable_step(_) ->
 	Scenario = datatable_step,
-	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario), true)),
+	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario))),
 	ok.
 
 lexer_docstring_step(_) ->
 	Scenario = docstring_step,
-	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario), true)),
+	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario))),
 	ok.
 
 lexer_scenario_outline(_) ->
 	Scenario = scenario_outline,
-	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario), true)),
+	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario))),
 	ok.
 
 lexer_feature_tags(_) ->
 	Scenario = feature_tags,
-	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario), true)),
+	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario))),
 	ok.
 
 lexer_scenario_tags(_) ->
 	Scenario = scenario_tags,
-	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario), true)),
+	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario))),
 	ok.
 
 lexer_multiple_scenarios(_) ->
 	Scenario = multiple_scenarios,
-	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario), true)),
+	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario))),
 	ok.
 
 lexer_lots_of_crlfs(_) ->
 	Scenario = lots_of_crlfs,
-	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario), true)),
+	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario))),
 	ok.
 
 lexer_lots_of_comments(_) ->
 	Scenario = lots_of_comments,
-	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario), true)),
+	?assertEqual(test_data:lexer_output(Scenario), egherkin:lexer(test_data:source(Scenario))),
 	ok.
 
 %%endregion
